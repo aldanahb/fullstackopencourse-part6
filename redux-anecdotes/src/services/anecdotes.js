@@ -10,7 +10,7 @@ const getAll = async () => {
     return await response.json()
 }
 
-const createNewAnecdote = async content => {
+const createNewAnecdote = async (content) => {
     const anecdote = {
         id: 100000 * Math.random().toFixed(0),
         content: content,
@@ -32,4 +32,30 @@ const createNewAnecdote = async content => {
     return await response.json()
 }
 
-export default { getAll, createNewAnecdote }
+const updateAnecdote = async (id) => {
+    const anecdote = (await fetch(`${baseUrl}/${id}`))
+
+    if(!anecdote.ok) {
+        throw new Error('Failed to get anecdote')
+    }
+
+    const anecdoteData = await anecdote.json()
+
+    const updatedAnecdote = {...anecdoteData, votes: anecdoteData.votes + 1}
+
+    const options = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedAnecdote)
+    }
+
+    const response = await fetch(`${baseUrl}/${id}`, options)
+
+    if (!response.ok) {
+        throw new Error('Failed to update anecdote')
+    }
+
+    return await response.json()
+}
+
+export default { getAll, createNewAnecdote, updateAnecdote }
