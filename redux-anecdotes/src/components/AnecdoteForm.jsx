@@ -1,15 +1,33 @@
 import { useDispatch } from 'react-redux'
-import { createNewAnecdote } from '../reducers/anecdoteReducer'
+import { addAnecdote } from '../reducers/anecdoteReducer'
+import { setNotification } from '../reducers/notificationReducer'
+import { useRef } from 'react' 
 
 const AnecdoteForm = () => {
 
     const dispatch = useDispatch()
+
+    const timeoutRef = useRef(null)
     
     const createAnecdote = event => {
         event.preventDefault()
         const anecdoteContent = event.target.anecdote.value
         event.target.anecdote.value = ''
-        dispatch(createNewAnecdote(anecdoteContent))
+
+        dispatch(addAnecdote(anecdoteContent))
+
+        // agregar notificación
+        dispatch(setNotification(`you added '${anecdoteContent}'`))
+        
+        // verificar si ya hay alguna notificación y reiniciar contador
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current)
+        }
+        
+        // quitar notificación a los 5 segundos
+        timeoutRef.current = setTimeout(() => {
+            dispatch(setNotification(''))
+            }, 5000) 
     }
 
     return (<div>
